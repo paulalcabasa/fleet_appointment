@@ -29,8 +29,7 @@
               <div
                 class="wizard-step"
                 data-wizard-type="step"
-                
-              >
+                 data-wizard-state="current">
                 <div class="wizard-label">
                   <h3 class="wizard-title"><span>1</span> Dealer</h3>
                   <div class="wizard-bar"></div>
@@ -42,7 +41,7 @@
                   <div class="wizard-bar"></div>
                 </div>
               </div>
-              <div class="wizard-step" data-wizard-type="step" data-wizard-state="current">
+              <div class="wizard-step" data-wizard-type="step">
                 <div class="wizard-label">
                   <h3 class="wizard-title"><span>3</span> Vehicle Information</h3>
                   <div class="wizard-bar"></div>
@@ -67,7 +66,7 @@
                 <div
                   class="pb-5"
                   data-wizard-type="step-content"
-              
+                   data-wizard-state="current"
                 >
                   <h4 class="mb-10 font-weight-bold text-dark">
                     Choose your preferred dealership
@@ -75,18 +74,11 @@
 
                   <div class="form-group">
                     <label>Dealer</label>
-                    <v-select2 :options="options"></v-select2>
-                    <span class="form-text text-muted"
-                      >Please enter your Address.</span
-                    >
+                    <v-select2 :options="options" size="lg"></v-select2>
                   </div>
                   <div class="form-group">
                     <label>Site location</label>
-                      <v-select2 :options="['Dealer', 'On-site']"></v-select2>
-                    
-                    <span class="form-text text-muted"
-                      >Please enter your Address.</span
-                    >
+                    <v-select2 :options="['Dealer', 'On-site']" size="lg"></v-select2>
                   </div>
                
                 </div>
@@ -106,7 +98,7 @@
                 <!--end: Wizard Step 2-->
 
                 <!--begin: Wizard Step 3-->
-                <div class="pb-5" data-wizard-type="step-content" data-wizard-state="current">
+                <div class="pb-5" data-wizard-type="step-content">
                   <h4 class="mb-10 font-weight-bold text-dark">
                     Indicate your vehicles for servicing
                   </h4>
