@@ -111,18 +111,22 @@
                     Indicate your vehicles for servicing
                   </h4>
                   <div>
-                    <b-card>
-
+                    <b-card v-for="(row,index) in vehicles" :key="index" class="mb-5">
                       <b-row>
                         <b-col sm="6">
-                          
                           <h5 class="mb-5">Vehicle information</h5>
                           <b-row class="my-1">
                             <b-col sm="4">
                               <label for="input-small">CS Number:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small"  size="sm" placeholder="Enter the CS No."></b-form-input>
+                                <b-input-group>
+                                  <b-form-input size="sm"></b-form-input>
+                                  <b-input-group-append>
+                                    <b-button variant="outline-primary" size="sm"><i class="flaticon2-search icon-sm"></i></b-button>
+                                  
+                                  </b-input-group-append>
+                                </b-input-group>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -190,7 +194,7 @@
                               <tr>
                                 <th>Type</th>
                                 <th>Description</th>
-                                
+                                <th></th>
                               </tr>
                             </thead>
                             <tbody>
@@ -201,17 +205,8 @@
                                 <td>
                                   <b-form-input size="sm" placeholder="Kindly tell us what to do..." />
                                 </td>
+                                <td><b-link href="#foo"><i class="flaticon2-delete icon-sm text-danger"></i></b-link></td>
                               </tr>
-                               <tr>
-                                <td>
-                                  <b-form-select :options="joTypes" size="sm"></b-form-select>
-                                </td>
-                                <td>
-                                  <b-form-input size="sm" placeholder="Kindly tell us what to do..." />
-                                </td>
-                              </tr>
-                             
-
                             </tbody>
                             <tfoot>
                               <tr>
@@ -225,11 +220,13 @@
                         </b-col>
                       </b-row>
                      
-                      <a href="#" class="card-link">Remove</a>
+                      <div class="mt-5 text-right">
+                        <b-link @click.prevent="removeVehicle(index)">Remove this item</b-link>
+                      </div>
                     </b-card>
 
-                    <div class="text-right mt-5">
-                      <b-link href="#foo">Add another vehicle</b-link>
+                    <div class="mt-5">
+                      <b-link @click.prevent="addVehicle">Add another vehicle</b-link>
                     </div>
                   </div>
                   
@@ -358,6 +355,11 @@ export default {
          { value: 1, text: 'PMS' },
          { value: 2, text: 'Repair' },
          { value: 3, text: 'Other' },
+       ],
+       vehicles : [
+         {
+           cs_no : '',
+         }
        ]
     }
   },
@@ -396,6 +398,14 @@ export default {
         icon: "success",
         confirmButtonClass: "btn btn-secondary"
       });
+    },
+    addVehicle(){
+      this.vehicles.push({
+        cs_no : ''
+      });
+    },
+    removeVehicle(index){
+      this.vehicles.splice(index,1);
     }
   }
 };
