@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 <template>
   <!-- begin:: Header Topbar -->
   <div class="topbar">

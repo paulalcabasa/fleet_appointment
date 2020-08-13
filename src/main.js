@@ -9,9 +9,16 @@ import { VERIFY_AUTH } from "@/core/services/store/auth.module";
 import { RESET_LAYOUT_CONFIG } from "@/core/services/store/config.module";
 import vSelect from 'vue-select'
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import moment from 'moment'
 Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
 Vue.component('v-select2', vSelect)
 Vue.config.productionTip = false;
+Vue.filter('formatDate', function (value) {
+  if (value) {
+    return moment(String(value), ["YYYY-MM-DD h:mm A"]).format('dddd, MMMM Do YYYY, h:mm:ss a')
+  }
+});
+
 
 // Global 3rd party plugins
 import "popper.js";

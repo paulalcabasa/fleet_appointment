@@ -15,12 +15,20 @@ module.exports = {
   },
   chainWebpack: config => {
     config.module
+      .rule("vue")
+      .use("vue-svg-inline-loader")
+      .loader("vue-svg-inline-loader")
+      .options({
+        /* ... */
+      });
+
+    /* config.module
       .rule("eslint")
       .use("eslint-loader")
       .tap(options => {
         options.configFile = path.resolve(__dirname, ".eslintrc.js");
         return options;
-      });
+      }); */
   },
   css: {
     loaderOptions: {

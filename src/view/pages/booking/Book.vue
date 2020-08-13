@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Card v-bind:title="'Consent'" v-show="!agree">
+    <Card v-bind:title="'Consent'" v-show="!form.agree">
       <template v-slot:body>
           <blockquote class="pl-10 pr-10">
             By cliking the button below, I hereby give my consent to Isuzu Philippines Corporation (IPC), its authorized
@@ -9,12 +9,12 @@
             Read full data privacy policy at <a href="https://www.isuzuphil.com/about/privacy-policy">https://www.isuzuphil.com/about/privacy-policy</a>
           </blockquote>
          <div class="text-center">
-            <b-button variant="success" @click="agree = true">Agree</b-button>
+            <b-button variant="success" @click="form.agree = true">Agree</b-button>
         </div>
       </template>
     </Card> 
     
-    <div class="card card-custom" v-show="agree">
+    <div class="card card-custom" v-show="form.agree">
       <div class="card-body p-0">
         <!--begin: Wizard-->
         <div
@@ -29,7 +29,7 @@
               <div
                 class="wizard-step"
                 data-wizard-type="step"
-                 data-wizard-state="current">
+                data-wizard-state="current">
                 <div class="wizard-label">
                   <h3 class="wizard-title"><span>1</span> Dealer</h3>
                   <div class="wizard-bar"></div>
@@ -44,6 +44,12 @@
               <div class="wizard-step" data-wizard-type="step">
                 <div class="wizard-label">
                   <h3 class="wizard-title"><span>3</span> Vehicle Information</h3>
+                  <div class="wizard-bar"></div>
+                </div>
+              </div>
+              <div class="wizard-step" data-wizard-type="step">
+                <div class="wizard-label">
+                  <h3 class="wizard-title"><span>4</span> Details of Request</h3>
                   <div class="wizard-bar"></div>
                 </div>
               </div>
@@ -66,19 +72,19 @@
                 <div
                   class="pb-5"
                   data-wizard-type="step-content"
-                   data-wizard-state="current"
+                    data-wizard-state="current"
                 >
                   <h4 class="mb-10 font-weight-bold text-dark">
                     Choose your preferred dealership
                   </h4>
-
+                   
                   <div class="form-group">
                     <label>Dealer</label>
-                    <v-select2 :options="options" size="lg"></v-select2>
+                    <v-select2 class="custom-select2" v-model="form.dealer" :options="dealerOptions" label="accountName"></v-select2>
                   </div>
                   <div class="form-group">
                     <label>Site location</label>
-                    <v-select2 :options="['Dealer', 'On-site']" size="lg"></v-select2>
+                    <v-select2 class="custom-select2" v-model="form.location" :options="siteLocations" label="location" size="lg"></v-select2>
                   </div>
                
                 </div>
@@ -90,8 +96,9 @@
                     Select your date and time
                   </h4>
                    <VueCtkDateTimePicker 
-                            v-model="yourValue" 
+                            v-model="form.datetime" 
                             :inline="true"
+                            :no-keyboard="true"
                             :disabledDates="disabledDates"
                     />
                 </div>
@@ -103,7 +110,8 @@
                     Indicate your vehicles for servicing
                   </h4>
                   <div>
-                    <b-card v-for="(row,index) in vehicles" :key="index" class="mb-5">
+                   
+                    <b-card v-for="(row,index) in form.vehicles" :key="index" class="mb-5">
                       <b-row>
                         <b-col sm="6">
                           <h5 class="mb-5">Vehicle information</h5>
@@ -113,9 +121,9 @@
                             </b-col>
                             <b-col sm="8">
                                 <b-input-group>
-                                  <b-form-input size="sm"></b-form-input>
+                                  <b-form-input size="sm" v-model="row.csNo"></b-form-input>
                                   <b-input-group-append>
-                                    <b-button variant="outline-primary" size="sm"><i class="flaticon2-search icon-sm"></i></b-button>
+                                    <b-button variant="outline-primary" type="button" size="sm" @click="searchCsNo(index)"><i class="flaticon2-search icon-sm"></i></b-button>
                                   
                                   </b-input-group-append>
                                 </b-input-group>
@@ -126,7 +134,7 @@
                               <label for="input-small">Unit Model:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" disabled="disabled" size="sm" ></b-form-input>
+                              <b-form-input id="input-small" v-model="row.unitModel" size="sm" ></b-form-input>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -134,7 +142,7 @@
                               <label for="input-small">Engine Number:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" disabled="disabled" size="sm"></b-form-input>
+                              <b-form-input id="input-small" :value="row.engineNo" size="sm"></b-form-input>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -142,7 +150,7 @@
                               <label for="input-small">VIN:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" disabled="disabled" size="sm"></b-form-input>
+                              <b-form-input id="input-small" :value="row.vin" size="sm"></b-form-input>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -150,7 +158,7 @@
                               <label for="input-small">Plate Number:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" size="sm" placeholder="Enter the plate number..."></b-form-input>
+                              <b-form-input id="input-small" size="sm" v-model="row.plateNo" placeholder="Enter the plate number..."></b-form-input>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -158,7 +166,7 @@
                               <label for="input-small">Purchase Order No:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" size="sm" placeholder="Enter the purchase order no..."></b-form-input>
+                              <b-form-input id="input-small" size="sm" v-model="row.poNo" placeholder="Enter the purchase order no..."></b-form-input>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -166,7 +174,7 @@
                               <label for="input-small">Purchase order:</label>
                             </b-col>
                             <b-col sm="8">
-                               <b-form-file id="file-small" size="sm"></b-form-file>
+                               <b-form-file id="file-small" size="sm" ></b-form-file>
                             </b-col>
                           </b-row>
                           <b-row class="my-1">
@@ -174,7 +182,7 @@
                               <label for="input-small">Actual Mileage:</label>
                             </b-col>
                             <b-col sm="8">
-                              <b-form-input id="input-small" size="sm" placeholder="Enter the actual mileage..."></b-form-input>
+                              <b-form-input id="input-small" size="sm" v-model="row.actualMileage" placeholder="Enter the actual mileage..."></b-form-input>
                             </b-col>
                           </b-row>
                         </b-col>
@@ -190,20 +198,20 @@
                               </tr>
                             </thead>
                             <tbody>
-                              <tr>
+                              <tr v-for="(jo, joIndex) in row.jobOrders" :key="joIndex">
                                 <td>
-                                  <b-form-select :options="joTypes" size="sm"></b-form-select>
+                                  <b-form-select :options="joTypes" size="sm" v-model="jo.type"></b-form-select>
                                 </td>
                                 <td>
-                                  <b-form-input size="sm" placeholder="Kindly tell us what to do..." />
+                                  <b-form-input size="sm" placeholder="Kindly tell us what to do..." v-model="jo.description"/>
                                 </td>
-                                <td><b-link href="#foo"><i class="flaticon2-delete icon-sm text-danger"></i></b-link></td>
+                                <td><b-link @click.prevent="removeJo(index, joIndex)"><i class="flaticon2-delete icon-sm text-danger"></i></b-link></td>
                               </tr>
                             </tbody>
                             <tfoot>
                               <tr>
                                 <td colspan="2" align="right">
-                                  <a href="#" class="card-link text-right">Add job order</a>
+                                  <a href="#" @click.prevent="addJo(index)" class="card-link text-right">Add job order</a>
                                 </td>
                               </tr>
                             </tfoot>
@@ -227,52 +235,116 @@
                 <!--end: Wizard Step 3-->
 
                 <!--begin: Wizard Step 5-->
-                <div class="pb-5" data-wizard-type="step-content" >
+                <div class="pb-5" data-wizard-type="step-content">
+                  <h4 class="mb-10 font-weight-bold text-dark">
+                    Details of Request
+                  </h4>
+                  <b-row class="my-1">
+                    <b-col sm="4">
+                      <label for="input-small">Requestor</label>
+                    </b-col>
+                    <b-col sm="8">
+                      <b-form-input  disabled="disabled" size="lg" value="John Doe" ></b-form-input>
+                    </b-col>
+                  </b-row>
+                  <b-row class="my-1">
+                    <b-col sm="4">
+                      <label for="input-small">Site Location</label>
+                    </b-col>
+                    <b-col sm="8">
+                      <b-form-input  disabled="disabled" size="lg" value="Laguna" ></b-form-input>
+                    </b-col>
+                  </b-row>
+                  <b-row class="my-1">
+                    <b-col sm="4">
+                      <label for="input-small">Contact Person</label>
+                    </b-col>
+                    <b-col sm="8">
+                      <b-form-input v-model="form.contactPerson" size="lg" placeholder="Complete name"></b-form-input>
+                    </b-col>
+                  </b-row>
+                  <b-row class="my-1">
+                    <b-col sm="4">
+                      <label for="input-small">Contact Number</label>
+                    </b-col>
+                    <b-col sm="8">
+                      <b-form-input v-model="form.contactNumber" size="lg" placeholder="Mobile number"></b-form-input>
+                    </b-col>
+                  </b-row>
+
+
+                </div>
+                <!--end: Wizard Step 5-->
+
+                <!--begin: Wizard Step 5-->
+                <div class="pb-5" data-wizard-type="step-content">
                   <h4 class="mb-10 font-weight-bold text-dark">
                     Review your Details and Submit
                   </h4>
                   <div class="border-bottom mb-5 pb-5">
                     <div class="font-weight-bold mb-3">
-                      Current Address:
+                      Dealer
                     </div>
                     <div class="line-height-md">
-                      Address Line 1
+                      {{ form.dealer.accountName }}
                       <br />
-                      Address Line 2 <br />
-                      Melbourne 3000, VIC, Australia
+                      {{ form.location.location }}<br />
                     </div>
                   </div>
                   <div class="border-bottom mb-5 pb-5">
                     <div class="font-weight-bold mb-3">
-                      Delivery Details:
+                      Date and Time
                     </div>
                     <div class="line-height-md">
-                      Package: Complete Workstation (Monitor, Computer, Keyboard &
-                      Mouse)
-                      <br />
-                      Weight: 25kg <br />
-                      Dimensions: 110cm (w) x 90cm (h) x 150cm (L)
+                      {{ form.datetime | formatDate }}
                     </div>
                   </div>
                   <div class="border-bottom mb-5 pb-5">
                     <div class="font-weight-bold mb-3">
-                      Delivery Service Type:
+                      Vehicle Information
                     </div>
                     <div class="line-height-md">
-                      Overnight Delivery with Regular Packaging
-                      <br />
-                      Preferred Morning (8:00AM - 11:00AM) Delivery
+                     <b-table :items="form.vehicles" :fields="fields" responsive="sm">
+                        <template v-slot:cell(job_order)="row">
+                          <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+                            {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
+                          </b-button>
+                        </template>
+                        <template v-slot:row-details="row">
+                          <b-card>
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th>Type</th>
+                                  <th>Description</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(job, index) in form.vehicles[row.index].jobOrders" :key="index">
+                                  <td>{{ job.type }}</td>
+                                  <td>{{ job.description }}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <b-button size="sm" @click="row.toggleDetails">Hide Details</b-button>
+                          </b-card>
+                        </template>
+                      </b-table>
                     </div>
                   </div>
                   <div class="mb-5">
                     <div class="font-weight-bold mb-3">
-                      Delivery Address:
+                      Details of Request
                     </div>
                     <div class="line-height-md">
-                      Address Line 1
+                      John Doe
                       <br />
-                      Address Line 2 <br />
-                      Preston 3072, VIC, Australia
+                      Laguna
+                      <br />
+                      {{ form.contactPerson }}
+                      <br />
+                      {{ form.contactNumber }}
+                      <br />
                     </div>
                   </div>
                 </div>
@@ -320,6 +392,21 @@
 <style lang="scss">
 @import "@/assets/sass/pages/wizard/wizard-3.scss";
 </style>
+<style >
+  .custom-select2 .vs__search::placeholder,
+  .custom-select2 .vs__dropdown-toggle,
+  .custom-select2 .vs__dropdown-menu {
+    text-transform: lowercase;
+    font-variant: small-caps;
+    font-size:1.5em;
+  }
+
+  .custom-select2 .vs__clear,
+  .custom-select2 .vs__open-indicator {
+    fill: #394066;
+  }
+
+</style>
 
 <script>
 import { SET_BREADCRUMB } from "@/core/services/store/breadcrumbs.module";
@@ -329,42 +416,80 @@ import Swal from "sweetalert2";
 import Card from '@/view/content/Card';
 export default {
   name: "Book",
+  props: ['appointmentId'],
   components: {
       Card,
   },
   data() {
     return {
-        options: [
-            'foo',
-            'bar',
-            'baz'
-        ],
-        agree : true,
+        csNo:  '',
+        form: {
+          agree : this.appointmentId != null ? true : false,
+          dealer : '',
+          location : '',
+          datetime : '',
+          contactPerson : '',
+          contactNumber : '',
+          vehicles : [{
+            csNo : '',
+            plateNo :'',
+            poNo : '',
+            poFile : '',
+            actualMileage : '',
+            unitModel : '',
+            engineNo : '',
+            vin : '',
+            showDetails:false,
+            jobOrders : [
+              {
+                id : '',
+                type : '',
+                description : ''
+              }
+            ],
+          }]
+        },
         disabledDates: [ "2020-08-05", "2020-08-07" ], 
-        yourValue : "",
         enabledDates: [ "2021-02-21", "2021-02-22", "2021-02-23" ] ,
         joTypes: [
          { value: 1, text: 'PMS' },
          { value: 2, text: 'Repair' },
          { value: 3, text: 'Other' },
        ],
-       vehicles : [
+       dealerOptions : [
          {
-           cs_no : '',
-         }
-       ]
+           id : 1,
+           accountName : 'Isuzu Sta. Rosa'
+         },
+         {
+           id : 2,
+           accountName : 'Isuzu Alabang'
+         },
+         {
+           id : 3,
+           accountName : 'Isuzu Pasig'
+         },
+       ],
+      siteLocations : [
+        {
+          id : 1,
+          location : 'Dealer'
+        },
+        {
+          id : 2,
+          location : 'On-site'
+        }
+      ],
+      fields: ['csNo', 'unitModel', 'engineNo', 'vin', 'plateNo', 'poNo', 'poFile', 'actualMileage', 'job_order'],  
     }
   },
   mounted() {
-    this.$store.dispatch(SET_BREADCRUMB, [
-      { title: "Wizard", route: "wizard-1" },
-      { title: "Wizard-3" }
-    ]);
-
+  
+    console.log(this.appointmentId);
     // Initialize form wizard
     const wizard = new KTWizard("kt_wizard_v3", {
       startStep: 1, // initial active step number
-      clickableSteps: true // allow step clicking
+     // clickableSteps: true // allow step clicking
     });
 
     // Validation before going to next page
@@ -380,6 +505,9 @@ export default {
       }, 500);
     });
   },
+  created() {
+    //this.form.vehicles.push(this.defaultVehicle);
+  },
   methods: {
     
     submit: function(e) {
@@ -392,12 +520,42 @@ export default {
       });
     },
     addVehicle(){
-      this.vehicles.push({
-        cs_no : ''
-      });
+      this.form.vehicles.push({
+            csNo : '',
+            plateNo :'',
+            poNo : '',
+            poFile : '',
+            actualMileage : '',
+            unitModel : '',
+            engineNo : '',
+            vin : '',
+            jobOrders : [
+              {
+                id : '',
+                type : '',
+                description : ''
+              }
+            ],
+          });
     },
     removeVehicle(index){
-      this.vehicles.splice(index,1);
+      this.form.vehicles.splice(index,1);
+    },
+    removeJo(vehicleIndex, joIndex){
+      this.form.vehicles[vehicleIndex].jobOrders.splice(joIndex,1);
+    },
+    addJo(vehicleIndex){
+      this.form.vehicles[vehicleIndex].jobOrders.push({
+        id : 0,
+        type : '',
+        description : ''
+      });
+    },
+    searchCsNo(index){
+    // perform axios call
+      this.form.vehicles[index].unitModel = "Mu-X 4X4 LS-A AT";
+      this.form.vehicles[index].engineNo = "12345";
+      this.form.vehicles[index].vin = "12345";
     }
   }
 };
