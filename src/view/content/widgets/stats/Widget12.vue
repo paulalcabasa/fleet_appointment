@@ -25,15 +25,7 @@
           </span>
         </div>
       </div>
-      <!--begin::Chart-->
-      <apexchart
-        class="card-rounded-bottom"
-        :options="chartOptions"
-        :series="series"
-        type="area"
-        width="100%"
-      ></apexchart>
-      <!--end::Chart-->
+      
     </div>
     <!--end::Body-->
   </div>

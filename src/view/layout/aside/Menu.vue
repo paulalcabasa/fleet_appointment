@@ -86,12 +86,37 @@
     </router-link>
 
     <li class="menu-section">
+      <h4 class="menu-text">SCHEDULE</h4>
+      <i class="menu-icon flaticon-more-v2"></i>
+    </li>
+
+    <router-link
+      to="/calendar"
+      v-slot="{ href, navigate, isActive, isExactActive }"
+    >
+      <li
+        aria-haspopup="true"
+        data-menu-toggle="hover"
+        class="menu-item"
+        :class="[
+          isActive && 'menu-item-active',
+          isExactActive && 'menu-item-active'
+        ]"
+      >
+        <a :href="href" class="menu-link" @click="navigate">
+          <i class="menu-icon flaticon2-calendar"></i>
+          <span class="menu-text">Calendar</span>
+        </a>
+      </li>
+    </router-link>
+
+    <li class="menu-section">
       <h4 class="menu-text">REPORTS</h4>
       <i class="menu-icon flaticon-more-v2"></i>
     </li>
 
     <router-link
-      to="/schedules"
+      to="/summary"
       v-slot="{ href, navigate, isActive, isExactActive }"
     >
       <li
@@ -109,6 +134,7 @@
         </a>
       </li>
     </router-link>
+
 
   
   </ul>

@@ -1,93 +1,69 @@
 <template>
   <div>
-    <!--begin::Dashboard-->
+    <!-- Statistics -->
     <div class="row">
-      <div class="col-xxl-4">
-        <MixedWidget1></MixedWidget1>
+      <div class="col-lg-3 col-xl-3 order-lg-1 order-xl-1">
+        <Card :class="'bg-primary text-white'">
+          <template v-slot:body>
+            <Statistics :title="'10'" desc="PENDING" icon="la la-hourglass-o text-white" />
+          </template>
+        </Card>
       </div>
-      <div class="col-xxl-4">
-        <ListWidget9></ListWidget9>
+      <div class="col-lg-3 col-xl-3 order-lg-1 order-xl-1">
+        <Card :class="'bg-info text-white'">
+          <template v-slot:body>
+            <Statistics :title="20" desc="CONFIRMED" icon="la la-calendar-o text-white" />
+          </template>
+        </Card>
       </div>
-      <div class="col-xxl-4">
-        <StatsWidget7></StatsWidget7>
-        <StatsWidget12></StatsWidget12>
+      <div class="col-lg-3 col-xl-3 order-lg-1 order-xl-1">
+        <Card :class="'bg-warning text-white'">
+          <template v-slot:body>
+            <Statistics :title="30" desc="ON GOING" icon="la la-wrench text-white" />
+          </template>
+        </Card>
       </div>
+      <div class="col-lg-3 col-xl-3 order-lg-1 order-xl-1">
+        <Card :class="'bg-success text-white'">
+          <template v-slot:body>
+            <Statistics :title="30" desc="COMPLETED" icon="la la-check-circle-o text-white" />
+          </template>
+        </Card>
+      </div>
+       
+    </div>
+    <!-- end of statistics -->
 
-      <div class="col-xxl-4 order-1 order-xxl-1">
-        <ListWidget1></ListWidget1>
+    <div class="row">
+      <div class="col-md-6">
+        <TodaysSchedule></TodaysSchedule>
       </div>
-      <div class="col-xxl-8 order-2 order-xxl-1">
-        <AdvancedTableWidget2></AdvancedTableWidget2>
-      </div>
-
-      <div class="col-xxl-4 order-1 order-xxl-2">
-        <ListWidget3></ListWidget3>
-      </div>
-      <div class="col-xxl-4 order-1 order-xxl-2">
-        <ListWidget4></ListWidget4>
-      </div>
-      <div class="col-lg-12 col-xxl-4 order-1 order-xxl-2">
-        <ListWidget8></ListWidget8>
+      <div class="col-md-6">
+        <Upcoming></Upcoming>
       </div>
     </div>
-    <!--end::Dashboard-->
   </div>
 </template>
 
 <script>
-import { SET_BREADCRUMB } from "@/core/services/store/breadcrumbs.module";
-import AdvancedTableWidget2 from "@/view/content/widgets/advance-table/Widget2.vue";
-import MixedWidget1 from "@/view/content/widgets/mixed/Widget1.vue";
-import ListWidget1 from "@/view/content/widgets/list/Widget1.vue";
-import ListWidget3 from "@/view/content/widgets/list/Widget3.vue";
-import ListWidget4 from "@/view/content/widgets/list/Widget4.vue";
-import ListWidget8 from "@/view/content/widgets/list/Widget8.vue";
-import ListWidget9 from "@/view/content/widgets/list/Widget9.vue";
-import StatsWidget7 from "@/view/content/widgets/stats/Widget7.vue";
-import StatsWidget12 from "@/view/content/widgets/stats/Widget12.vue";
 
+import Statistics from '@/view/content/widgets/Statistics.vue';
+import TodaysSchedule from '@/view/content/widgets/TodaysSchedule.vue';
+import Upcoming from '@/view/content/widgets/Upcoming.vue';
+import Card from '@/view/content/Card.vue';
 export default {
   name: "dashboard",
   components: {
-    AdvancedTableWidget2,
-    MixedWidget1,
-    ListWidget1,
-    ListWidget3,
-    ListWidget4,
-    ListWidget8,
-    ListWidget9,
-    StatsWidget7,
-    StatsWidget12
+    TodaysSchedule,
+    Upcoming,
+    Statistics,
+    Card
   },
   mounted() {
-    this.$store.dispatch(SET_BREADCRUMB, [{ title: "Dashboard" }]);
+ 
   },
   methods: {
-    setActiveTab1(event) {
-      this.tabIndex = this.setActiveTab(event);
-    },
-    setActiveTab2(event) {
-      this.tabIndex2 = this.setActiveTab(event);
-    },
-    /**
-     * Set current active on click
-     * @param event
-     */
-    setActiveTab(event) {
-      // get all tab links
-      const tab = event.target.closest('[role="tablist"]');
-      const links = tab.querySelectorAll(".nav-link");
-      // remove active tab links
-      for (let i = 0; i < links.length; i++) {
-        links[i].classList.remove("active");
-      }
-
-      // set current active tab
-      event.target.classList.add("active");
-
-      // set clicked tab index to bootstrap tab
-      return parseInt(event.target.getAttribute("data-tab"));
-    }
+  
   }
 };
 </script>
