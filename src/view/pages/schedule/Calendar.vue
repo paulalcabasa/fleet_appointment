@@ -1,8 +1,99 @@
 <template>
+
   <v-row class="fill-height">
+
+      <v-dialog v-model="dialog" persistent max-width="600px">
+          <v-card>
+          <v-card-title>
+            <span class="headline">Event Details</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                
+                <v-col cols="12">
+                  <v-text-field label="Event Name*" required></v-text-field>
+                </v-col>
+
+				<v-col cols="12" sm="6" md="4">
+					<v-menu
+						v-model="newEvent.startMenu"
+						:close-on-content-click="false"
+						:nudge-right="40"
+						transition="scale-transition"
+						offset-y
+						min-width="290px"
+					>
+						<template v-slot:activator="{ on, attrs }">
+						<v-text-field
+							v-model="newEvent.start"
+							label="Start Date*"
+							prepend-icon="event"
+							readonly
+							v-bind="attrs"
+							v-on="on"
+						></v-text-field>
+						</template>
+						<v-date-picker v-model="newEvent.start" @input="newEvent.startMenu = false"></v-date-picker>
+					</v-menu>
+
+					<v-menu
+						v-model="newEvent.endMenu"
+						:close-on-content-click="false"
+						:nudge-right="40"
+						transition="scale-transition"
+						offset-y
+						min-width="290px"
+					>
+						<template v-slot:activator="{ on, attrs }">
+						<v-text-field
+							v-model="newEvent.end"
+							label="End Date*"
+							prepend-icon="event"
+							readonly
+							v-bind="attrs"
+							v-on="on"
+						></v-text-field>
+						</template>
+						<v-date-picker v-model="newEvent.end" @input="newEvent.endMenu = false"></v-date-picker>
+					</v-menu>
+				</v-col>
+        
+            <!--     <v-col cols="12" >
+                   <v-row
+                      justify="space-around"
+                      align="center"
+                    >
+                  
+                      <v-date-picker
+                        v-model="newEvent.start"
+                        flat
+                      ></v-date-picker>
+                    
+                      <v-date-picker
+                        v-model="newEvent.end"
+                        elevation="15"
+                      ></v-date-picker>
+                    </v-row>
+                </v-col> -->
+              </v-row>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
+            <v-btn color="blue darken-1" text @click="dialog = false">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-col>
           <v-sheet height="64">
           <v-toolbar flat color="white">
+            <v-btn outlined class="mr-4" color="grey darken-2" @click="dialog = true" v-if="user.userType == 'dealer'">
+              New event
+              </v-btn>
               <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
               Today
               </v-btn>
@@ -106,21 +197,35 @@ export default {
     components: {},
     data() {
         return {
+			user : this.$store.getters.currentUser,
+            newEvent : {
+              start: new Date().toISOString().substr(0, 10),
+              end: new Date().toISOString().substr(0, 10),
+			  name: '',
+			  startMenu: false,
+			  endMenu: false,
+			},
+		 	
+			
+            dialogm1: '',
+            dialog: false,
             focus: '',
-			type: 'month',
-			typeToLabel: {
-				month: 'Month',
-				week: 'Week',
-				day: 'Daily'
-    		},
-			start: null,
-			end: null,
-			selectedEvent: {},
-			selectedElement: null,
-			selectedOpen: false,
-			events: [],
-			colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-			names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+            type: 'month',
+            typeToLabel: {
+              month: 'Month',
+              week: 'Week',
+              day: 'Daily'
+			},
+			
+
+            start: null,
+            end: null,
+            selectedEvent: {},
+            selectedElement: null,
+            selectedOpen: false,
+            events: [ ],
+            colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
+            names: ['Meeting', 'Holiday', 'Isuzu Cebu', 'Isuzu Alabang', 'Isuzu Pasig', 'Isuzu Davao'],
 		}
 	},
     mounted() {
@@ -129,13 +234,25 @@ export default {
     updated() {},
     created() {},
     methods: {
+		formatDate (date) {
+			if (!date) return null
+
+			const [year, month, day] = date.split('-')
+			return `${month}/${day}/${year}`
+		},
+		parseDate (date) {
+			if (!date) return null
+
+			onst [month, day, year] = date.split('/')
+			return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+		},
 		viewDay ({ date }) {
-		this.focus = date
-		this.type = 'day'
-    },
-    getEventColor (event) {
-      return event.color
-    },
+			this.focus = date
+			this.type = 'day'
+		},
+		getEventColor (event) {
+		return event.color
+		},
     setToday () {
       this.focus = this.today
     },
@@ -146,20 +263,20 @@ export default {
       this.$refs.calendar.next()
     },
     showEvent ({ nativeEvent, event }) {
-		const open = () => {
-			this.selectedEvent = event
-			this.selectedElement = nativeEvent.target
-			setTimeout(() => this.selectedOpen = true, 10)
-		}
+      const open = () => {
+        this.selectedEvent = event
+        this.selectedElement = nativeEvent.target
+        setTimeout(() => this.selectedOpen = true, 10)
+      }
 
-		if (this.selectedOpen) {
-			this.selectedOpen = false
-			setTimeout(open, 10)
-			} else {
-				open()
-			}
+      if (this.selectedOpen) {
+        this.selectedOpen = false
+        setTimeout(open, 10)
+        } else {
+          open()
+        }
 
-		nativeEvent.stopPropagation()
+      nativeEvent.stopPropagation()
     },
     updateRange ({ start, end }) {
       const events = []
@@ -168,7 +285,7 @@ export default {
       const max = new Date(`${end.date}T23:59:59`)
       const days = (max.getTime() - min.getTime()) / 86400000
       const eventCount = this.rnd(days, days + 20)
-
+    
       for (let i = 0; i < eventCount; i++) {
         const allDay = this.rnd(0, 3) === 0
         const firstTimestamp = this.rnd(min.getTime(), max.getTime())
@@ -176,13 +293,14 @@ export default {
         const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
         const second = new Date(first.getTime() + secondTimestamp)
 
-      /*   events.push({
+        events.push({
           name: this.names[this.rnd(0, this.names.length - 1)],
           start: this.formatDate(first, !allDay),
           end: this.formatDate(second, !allDay),
           color: this.colors[this.rnd(0, this.colors.length - 1)],
-        }) */
-      }
+        })  
+	  }
+		
 
       this.start = start
       this.end = end
@@ -237,6 +355,8 @@ export default {
 			})
 		}
     },
-    watch: {}
+    watch: {
+		
+	}
 };
 </script>

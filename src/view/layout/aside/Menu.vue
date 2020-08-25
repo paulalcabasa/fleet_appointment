@@ -27,6 +27,7 @@
 
     <router-link
       to="/book"
+      v-if="user.userType == 'customer'"
       v-slot="{ href, navigate, isActive, isExactActive }"
     >
       <li
@@ -67,6 +68,7 @@
 
     <router-link
       to="/approval"
+      v-if="user.userType == 'dealer' || user.userType == 'ipc'"
       v-slot="{ href, navigate, isActive, isExactActive }"
     >
       <li
@@ -143,6 +145,11 @@
 <script>
 export default {
   name: "KTMenu",
+  data() {
+    return {
+      user : this.$store.getters.currentUser
+    }
+  },
   methods: {
     hasActiveChildren(match) {
       return this.$route["path"].indexOf(match) !== -1;

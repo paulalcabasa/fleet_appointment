@@ -71,7 +71,7 @@
                     :tbody-tr-class="rowClass"
                 >
 					<template v-slot:cell(actions)="data">
-                        <b-dropdown size="sm" left variant="primary">
+                        <b-dropdown size="sm" left variant="primary" v-if="user.userType == 'customer'">
                             <template v-slot:button-content>
                                 <i class="fas fa-bars fa-1x"></i>
                             </template>
@@ -80,6 +80,25 @@
                             <b-dropdown-divider></b-dropdown-divider>
                             <b-dropdown-item href="#"><i class="fa fa-trash"></i> <span class="ml-2">Cancel</span></b-dropdown-item>
                         </b-dropdown>
+
+                        <b-dropdown size="sm" left variant="primary" v-if="user.userType == 'dealer' || user.userType == 'ipc'">
+                            <template v-slot:button-content>
+                                <i class="fas fa-bars fa-1x"></i>
+                            </template>
+                            <b-dropdown-item href="#" @click.prevent="view(data.item)"><i class="fa fa-search"></i> <span class="ml-2">View</span></b-dropdown-item>
+                            <b-dropdown-item href="#" v-if="data.item.status == 'Confirmed'"><i class="fas fa-cog"></i> <span class="ml-2">On going</span></b-dropdown-item>
+                            <b-dropdown-item href="#" v-if="data.item.status == 'Ongoing'"><i class="far fa-check-circle"></i> <span class="ml-2">Completed</span></b-dropdown-item>
+                            <b-dropdown-item href="#" v-if="data.item.status == 'Confirmed'"><i class="fas fa-user-times"></i> <span class="ml-2">No appearance</span></b-dropdown-item>
+                   
+                        </b-dropdown>
+					</template>
+
+                    <template v-slot:cell(status)="data">
+                        <b-badge variant="primary" v-if="data.item.status == 'Confirmed'">Confirmed</b-badge>
+                        <b-badge variant="warning" v-if="data.item.status == 'Ongoing'">Ongoing</b-badge>
+                        <b-badge variant="success" v-if="data.item.status == 'Completed'">Completed</b-badge>
+                        <b-badge variant="secondary" v-if="data.item.status == 'No appearance'">No appearance</b-badge>
+                        <b-badge variant="danger" v-if="data.item.status == 'Cancelled'">Cancelled</b-badge>
 					</template>
 
                     <template v-slot:head()="scope">
@@ -142,6 +161,7 @@ export default {
     },
 	data() {
 		return {
+            user : this.$store.getters.currentUser,
 			appointmentHeaders : [
 				{
 					key : 'actions',

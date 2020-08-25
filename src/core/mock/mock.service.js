@@ -5,14 +5,25 @@ var MockAdapter = require("axios-mock-adapter");
 // mock testing user accounts
 const users = [
   {
-    email: "admin@demo.com",
-    password: "demo",
-    token: "mgfi5juf74j"
+    name: 'IPC User',
+    username: "ipc",
+    password: "ipc",
+    token: "mgfi5juf74j",
+    userType: "ipc"
   },
   {
-    email: "admin2@demo.com",
-    password: "demo",
-    token: "fgj8fjdfk43"
+    name: 'Dealer User',
+    username: "dealer",
+    password: "dealer",
+    token: "fgj8fjdfk43",
+    userType: "dealer"
+  },
+  {
+    name: 'Customer User',
+    username: "customer",
+    password: "customer",
+    token: "fgj8fjdfk45",
+    userType: "customer"
   }
 ];
 
@@ -26,7 +37,7 @@ const MockService = {
       const credential = JSON.parse(data.data);
       const found = users.find(user => {
         return (
-          credential.email === user.email &&
+          credential.username === user.username &&
           credential.password === user.password
         );
       });

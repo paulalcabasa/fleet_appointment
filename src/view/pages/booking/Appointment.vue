@@ -2,7 +2,10 @@
     <div>
         <Card :title="'Appointment'">
             <template v-slot:toolbar>
-                <b-button variant="primary" v-b-modal.confirm-modal v-if="acceptFlag">Accept</b-button>
+                <b-button variant="primary" v-b-modal.confirm-modal v-if="acceptFlag" size="sm">Accept</b-button>
+                <b-button variant="success" v-b-modal.confirm-modal size="sm" class="mr-2" v-if="!acceptFlag">Complete</b-button>
+                <b-button variant="secondary" v-b-modal.confirm-modal size="sm" class="mr-2" v-if="!acceptFlag">Ongoing</b-button>
+                <b-button variant="danger" v-b-modal.confirm-modal size="sm" class="mr-2" v-if="!acceptFlag">No appearance</b-button>
             </template>
 
             <template v-slot:body>
@@ -65,6 +68,7 @@
         </Card>
         <Card :title="'Vehicle'">
             <template v-slot:toolbar>
+                <b-button variant="primary">Save</b-button>
             </template>
 
             <template v-slot:body>
@@ -91,10 +95,21 @@
                             <tr v-for="(job, index) in vehicles[row.index].jobOrders" :key="index">
                                 <td>{{ job.type }}</td>
                                 <td>{{ job.description }}</td>
-                                <td>{{ job.repair_date }}</td>
-                                <td>{{ job.completion_date }}</td>
-                                <td>{{ job.status }}</td>
-                                <td>{{ job.remarks }}</td>
+                                <td>
+                                    <b-input type="date" size="sm" v-model="job.repair_date"></b-input>
+                                </td>
+                                <td>
+                                    <b-input type="date" size="sm" v-model="job.completion_date"></b-input>
+                                </td>
+                                <td>
+                                    <b-select v-model="job.status" size="sm" :options="options"></b-select>
+                                </td>
+                                <td>
+                                    <b-form-textarea
+                                        id="textarea"
+                                        v-model="job.remarks"
+                                    ></b-form-textarea>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -143,6 +158,7 @@ export default {
     },
     data() {
         return {
+            options : ['pending','ongoing','completed'],
             acceptFlag : this.action == 'approve' ? true : false,
             vehicles : [{
                 csNo : 'CS1234',

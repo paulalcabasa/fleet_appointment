@@ -13,8 +13,7 @@ import Summary from '@/view/pages/reports/Summary';
 Vue.use(Router);
 
 export default new Router({
-  mode:"history",
-  base:"fleet_apointment",
+
   routes: [
     {
       path: "/",
